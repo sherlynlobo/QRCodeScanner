@@ -1,7 +1,9 @@
 package com.sl.qrcodescanner
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -34,6 +36,9 @@ class MainActivity : AppCompatActivity() {
         codeScanner.decodeCallback = DecodeCallback {
             runOnUiThread {
                 Toast.makeText(this,"Scan Result: ${it.text}", Toast.LENGTH_LONG).show()
+                val openURL = Intent(Intent.ACTION_VIEW)
+                openURL.data = Uri.parse("${it.text}")
+                startActivity(openURL)
             }
         }
 

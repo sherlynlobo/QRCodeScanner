@@ -1,8 +1,12 @@
 package com.sl.qrcodescanner
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.budiyev.android.codescanner.AutoFocusMode
 import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.DecodeCallback
@@ -14,6 +18,7 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
 
     private lateinit var codeScanner: CodeScanner
+    val MY_CAMERA_PERMISSION_REQUEST = 1111
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -28,19 +33,27 @@ class MainActivity : AppCompatActivity() {
 
         codeScanner.decodeCallback = DecodeCallback {
             runOnUiThread {
-                Toast.makeText(this,"Scan Result: $(it.text)", Toast.LENGTH_LONG).show()
-
+                Toast.makeText(this,"Scan Result: ${it.text}", Toast.LENGTH_LONG).show()
             }
         }
 
         codeScanner.errorCallback = ErrorCallback {
 
             runOnUiThread {
-                Toast.makeText(this,"Camera Error: $(it.message)",Toast.LENGTH_LONG).show()
+                Toast.makeText(this,"Camera Error: ${it.message}",Toast.LENGTH_LONG).show()
             }
         }
 
+        checkPermission()
         codeScanner.startPreview()
+    }
+
+    fun checkPermission(){
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)!== PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA),MY_CAMERA_PERMISSION_REQUEST)
+        }else{
+            codeScanner.startPreview()
+        }
     }
 
     override fun onResume() {
